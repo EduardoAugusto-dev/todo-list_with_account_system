@@ -1,0 +1,12 @@
+body {
+    background-color: #cecaca;
+    font-family: Arial, sans-serif;
+}
+
+.list-group {
+    border: solid 1px gray;
+}
+
+.btn-sm {
+    border-radius: 20%;
+}
