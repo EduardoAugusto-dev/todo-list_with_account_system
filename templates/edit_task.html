@@ -1,0 +1,30 @@
+<!-- modal_edit.html -->
+<div class="modal fade" id="editModal{{ task.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ task.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel{{ task.id }}">Editar Tarefa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulário de Edição -->
+                <form action="{{ url_for('tasks.update_task') }}" method="POST">
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                    <div class="mb-3">
+                        <label for="title{{ task.id }}" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="title{{ task.id }}" name="title" value="{{ task.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description{{ task.id }}" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="description{{ task.id }}" name="description" required>{{ task.description }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="term{{ task.id }}" class="form-label">Prazo</label>
+                        <input type="date" class="form-control" id="term{{ task.id }}" name="term" value="{{ task.term }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

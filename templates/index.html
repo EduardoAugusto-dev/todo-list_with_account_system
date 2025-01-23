@@ -3,79 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
     <title>Task Manager</title>
 </head>
-    <h1> Welcome to your task manager </h1>
-
-  <!-- Button trigger modal -->
-<div class="d-flex justify-content-center my-4">
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Create your task
-</button>
-
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Formulário no Modal</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Formulário -->
-          <form action="{{url_for('tasks.create_task')}}" method="POST">
-            <div class="mb-3">
-              <label for="title" class="form-label">Título</label>
-              <input type="text" class="form-control" id="title" name="title" required>
-            </div>
-            <div class="mb-3">
-              <label for="description" class="form-label">Descrição</label>
-              <textarea class="form-control" id="description" name="description" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="term" class="form-label">Prazo</label>
-              <input type="date" class="form-control" id="term" name="term" required>
-            </div>
-            <input type="hidden" name="user_id" value="{{ session['user_id'] }}">
-            <button type="submit" class="btn btn-primary">Enviar</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-
-  <div class="container d-flex justify-content-center align-items-start mt-5">
-    <div class="col-md-6">
-      <h1 class="text-center mb-4">Your Tasks</h1>
-      <ul class="list-group">
-          {% if tasks %}
-              {% for task in tasks %}
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div class="text-center w-100">
-                          <strong>{{ task.title }}</strong><br>
-                          <small>{{ task.description }}</small>
-                      </div>
-                      <span class="badge bg-secondary ms-2">{{ task.term }}</span>
-
-                      <form action="{{url_for('tasks.remove_task')}}" method="POST" style="display: inline;">
-                          <input type="hidden" name="task_id" value="{{ task.id}}">
-                          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                      </form>
-                  </li>
-              {% endfor %}
-          {% else %}
-              <li class="list-group-item text-center">No tasks available. Create one!</li>
-          {% endif %}
-      </ul>
-  </div>
-</div>
-
-
 <body>
+
+    <h1 class="text-center my-4">Welcome to your task manager</h1>
+
+    <div>
+        <form action="{{ url_for('user.logout') }}" method="POST">
+            <button type="submit" class="btn btn-danger">
+                Logout
+            </button>
+        </form>
+    </div>
     
+    <!-- Botão para criar nova tarefa -->
+    <div class="d-flex justify-content-center my-4">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+            Create your task
+        </button>
+    </div>
+
+    <!-- Modal de Criação -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('tasks.create_task') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="create-title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="create-title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="create-description" name="description" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-term" class="form-label">Term</label>
+                            <input type="date" class="form-control" id="create-term" name="term" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        {% if tasks %}
+        <ul class="list-group">
+            {% for task in tasks %}
+            <li class="list-group-item d-flex justify-content-between align-items-center {% if task.status == 'Expired' %}list-group-item-danger{% elif task.status == 'Completed' %}list-group-item-success{% endif %}">
+                <div class="text-center w-100">
+                    <strong>{{ task.title }}</strong><br>
+                    <small>{{ task.description }}</small>
+                    <small>Status: {{ task.status }}</small>
+                </div>
+                <span class="badge bg-secondary ms-2">{{ task.term }}</span>
+                <div>
+                    <form action="{{ url_for('tasks.remove_task') }}" method="POST" style="display: inline;">
+                        <input type="hidden" name="task_id" value="{{ task.id }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                    {% if task.status == 'Completed' %}
+                    <form action="{{ url_for('tasks.uncomplete_task') }}" method="POST" style="display: inline;">
+                        <input type="hidden" name="task_id" value="{{ task.id }}">
+                        <button type="submit" class="btn btn-warning btn-sm">Uncomplete</button>
+                    </form>
+                    {% else %}
+                    <form action="{{ url_for('tasks.complete_task') }}" method="POST" style="display: inline;">
+                        <input type="hidden" name="task_id" value="{{ task.id }}">
+                        <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                    </form>
+                    {% endif %}
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ task.id }}">
+                        Editar
+                    </button>
+                    {% include 'edit_task.html' %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        
+         
+        {% else %}
+            <p class="text-center">No tasks available.</p>
+        {% endif %}
+    </div>
+
 </body>
 </html>
